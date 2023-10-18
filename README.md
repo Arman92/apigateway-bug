@@ -29,6 +29,9 @@ In JSON Schema:
 
 However API Gateway does not support either of these when you import the OpenAPI specs with AWS CLI or CDK.
 
+# How to reproduce 
+Below I have documented two ways to reproduce this issue, AWC CLI and AWS CDK
+
 ## AWS CLI
 
 Using AWS CLI, one should be able to import OpenAPI specs to API Gateway, [source doc](https://docs.aws.amazon.com/cli/latest/reference/apigateway/import-rest-api.html)
