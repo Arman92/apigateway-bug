@@ -1,0 +1,94 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Arman Test API", "version": "0.0.1" },
+  "paths": {
+    "/testPost": {
+      "post": {
+        "operationId": "runTestPost",
+        "x-handler": { "language": "typescript" },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestBodySchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseBodySchema"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "AWS_PROXY",
+          "httpMethod": "POST",
+          "passthroughBehavior": "WHEN_NO_MATCH"
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RequestBodySchema": {
+        "type": "object",
+        "required": ["requestId", "orderList"],
+        "additionalProperties": false,
+        "properties": {
+          "requestId": { "type": "string", "format": "uuid" },
+          "orderList": { "$ref": "#/components/schemas/Orders" }
+        }
+      },
+      "ResponseBodySchema": {
+        "type": "object",
+        "required": ["requestId", "orderStatus", "message"],
+        "additionalProperties": false,
+        "properties": {
+          "requestId": { "type": "string", "format": "uuid" },
+          "orderStatus": { "type": "boolean", "nullable": true },
+          "message": { "type": ["string", "null"] }
+        }
+      },
+      "Orders": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "orderId": { "type": "string" },
+            "parentId": { "type": ["string", "null"] },
+            "partIdentifier": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }]
+            },
+            "description": { "type": "string" }
+          },
+          "required": ["orderId", "partIdentifier", "description"]
+        }
+      }
+    }
+  },
+
+  "x-amazon-apigateway-request-validators": {
+    "all": { "validateRequestBody": true, "validateRequestParameters": true }
+  },
+  "x-amazon-apigateway-request-validator": "all",
+  "x-amazon-apigateway-gateway-responses": {
+    "BAD_REQUEST_BODY": {
+      "statusCode": 400,
+      "responseTemplates": {
+        "application/json": "{\"message\": \"$context.error.validationErrorString\"}"
+      },
+      "responseParameters": {
+        "gatewayresponse.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,x-amz-content-sha256'",
+        "gatewayresponse.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+        "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
+      }
+    }
+  }
+}
